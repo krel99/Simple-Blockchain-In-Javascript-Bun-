@@ -5,10 +5,10 @@ import path from "path";
 import { mkdir } from "node:fs/promises";
 import getWantedList from "./helpers/api-fbi";
 
-const directoryPath = path.join(process.cwd(), "blockchain", "unminned");
+const DIRECTORY_PATH = path.join(process.cwd(), "blockchain", "unminned");
 
 async function createNBlocks(n) {
-  await mkdir(directoryPath, { recursive: true });
+  await mkdir(DIRECTORY_PATH, { recursive: true });
   const previousNonces = [];
 
   let hash = "";
@@ -34,7 +34,7 @@ async function createNBlocks(n) {
       encryptedData,
     };
 
-    const blockFilePath = path.join(directoryPath, `block${i}.json`);
+    const blockFilePath = path.join(DIRECTORY_PATH, `${block.hash}.json`);
     await Bun.write(blockFilePath, JSON.stringify(block, null, 2));
 
     // save nonce to avoid duplicate blocks

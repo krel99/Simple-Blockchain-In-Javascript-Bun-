@@ -10,7 +10,8 @@ export default async function encryptDataWithNonce(nonce, data) {
   const key = nonce.toString().padEnd(32, "0").slice(0, 32);
 
   // Initialization Vector (IV) for AES encryption (should be random but fixed length)
-  const iv = crypto.randomBytes(16);
+  // this should generally be random or determined in some less predictable way
+  const iv = Buffer.alloc(16, 0);
 
   // Create cipher with AES-256-CBC
   const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(key), iv);
