@@ -1,33 +1,53 @@
 import crypto from "crypto";
 import readline from "readline";
+import { mkdir } from "node:fs/promises";
+import { join } from "path";
 
 const authorizedMiners = ["karel", "souhail", "satoshi", "admin"];
+const difficulty = 3;
+const PATH = join("blockchain", "2.0");
 
-function mine(targetDifficulty) {
+async function mine(targetDifficulty, minerId) {
   for (let nonce = 0; ; nonce++) {
     const data = `BlockData${nonce}`;
     const hash = crypto.createHash("sha256").update(data).digest("hex");
     if (hash.startsWith("0".repeat(targetDifficulty))) {
-      return { nonce, hash };
+      return { nonce, hash, minerId };
     }
   }
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+async function mineOneBlock() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
-rl.question("Enter your miner ID: ", (minerId) => {
-  const difficulty = 3;
+  return new Promise((resolve) => {
+    rl.question("Enter your miner ID: ", (minerId) => {
+      if (!authorizedMiners.includes(minerId)) {
+        console.log(`Miner ${minerId} is not authorized.`);
+        rl.close();
+        resolve(null);
+        return;
+      }
 
-  if (!authorizedMiners.includes(minerId)) {
-    console.log(`Miner ${minerId} is not authorized.`);
-    rl.close();
-    return;
-  }
+      const newBlock = mine(difficulty, minerId);
+      console.log(`Miner ${minerId} found a hash.`);
+      rl.close();
+      resolve(newBlock);
+    });
+  });
+}
 
-  console.log(`Miner ${minerId} found a hash:`, mine(minerId, difficulty));
+const block = await mineOneBlock();
 
-  rl.close();
-});
+async function saveBlock(block) {
+  await mkdir(PATH, { recursive: true });
+  const fullPath = join(PATH, `block-${Date.now()}.json`);
+
+  await Bun.write(fullPath, JSON.stringify(block, null, 2));
+  console.log(`Block saved - ${filename}`);
+}
+
+saveBlock(block);

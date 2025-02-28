@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { mkdir } from "node:fs/promises";
 import { CryptoHasher } from "bun";
